@@ -1,0 +1,11 @@
+.git
+**/.venv
+**/venv
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+backend/app/incident_lab.db
+backend/app/*.db-wal
+backend/app/*.db-shm

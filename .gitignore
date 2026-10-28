@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local app data and secrets
+backend/app/incident_lab.db*
+.env
+.env.*
+!.env.example
+
+# Node / frontend build
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+shopsphere/node_modules/
+shopsphere/dist/
+shopsphere/.vite/

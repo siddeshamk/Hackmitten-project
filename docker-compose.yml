@@ -1,0 +1,58 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      SIGNALROOT_DB_PATH: /data/incident_lab.db
+      OTEL_SERVICE_NAME: signalroot-api
+      OTEL_DEPLOYMENT_ENVIRONMENT: docker-demo
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: llama3.2
+    volumes:
+      - signalroot-data:/data
+    expose:
+      - "8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  shopsphere:
+    build:
+      context: ./shopsphere
+      args:
+        VITE_SIGNALROOT_URL: http://127.0.0.1:8080
+    ports:
+      - "127.0.0.1:8081:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel-collector/config.docker.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+    restart: unless-stopped
+
+volumes:
+  signalroot-data:
